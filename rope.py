@@ -51,10 +51,6 @@ def apply_rotary_emb(
 
     _, seqlen, _, _ = query.shape
     device = query.device
-    # todo
-    #
-    # Please refer to slide 22 in https://phontron.com/class/anlp2024/assets/slides/anlp-05-transformers.pdf.
-    # You may also benefit from https://blog.eleuther.ai/rotary-embeddings/.
 
     # reshape xq and xk to match the complex representation
     query_real, query_imag = query.float().reshape(query.shape[:-1] + (-1, 2)).unbind(-1)
@@ -62,13 +58,25 @@ def apply_rotary_emb(
 
     # First, compute the trigonometric values in the second and fourth columns in
     # slide 22 (linked above).
+    freqs = torch.pow(theta, -torch.arange(0, head_dim, 2, device=device)[:(head_dim//2)].float() / head_dim)
+    pos = torch.arange(seqlen, device=device).float()[:max_seq_len]
+
+    freqs = torch.outer(freqs, pos).transpose(-2, -1).float()  # (head_dim // 2, max_seq_len)
+    freqs = reshape_for_broadcast(freqs, query_real)
+
+    # shape: (batch_size, seqlen, n_local_heads, head_dim // 2)
+    query_rotated_real = freqs.cos() * query_real - freqs.sin() * query_imag
+    query_rotated_imag = freqs.sin() * query_real + freqs.cos() * query_imag
+    key_rotated_real = freqs.cos() * key_real - freqs.sin() * key_imag
+    key_rotated_imag = freqs.sin() * key_real + freqs.cos() * key_imag
 
     # Then, combine these trigonometric values with the tensors query_real, query_imag,
     # key_real, and key_imag.
+    query_stack = torch.stack((query_rotated_real, query_rotated_imag), dim=-1)
+    key_stack = torch.stack((key_rotated_real, key_rotated_imag), dim=-1)
 
-    raise NotImplementedError
+    query_out = query_stack.reshape(query.shape)
+    key_out = key_stack.reshape(key.shape)
 
-    query_out = None
-    key_out = None
     # Return the rotary position embeddings for the query and key tensors
     return query_out, key_out

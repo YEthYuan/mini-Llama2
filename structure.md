@@ -37,13 +37,13 @@ The desired outputs are
 
 ### To be implemented
 Components that require your implementations are comment with ```#todo```. The detailed instructions can be found in their corresponding code blocks
-* ```llama.Attention.forward```
-* ```llama.RMSNorm.norm```
-* ```llama.Llama.forward```
-* ```llama.Llama.generate```
-* ```rope.apply_rotary_emb``` (this one may be tricky! you can use `rope_test.py` to test your implementation)
-* ```optimizer.AdamW.step```
-* ```classifier.LlamaEmbeddingClassifier.forward```
+1. [ ] ```llama.Attention.forward```
+2. [x] ```llama.RMSNorm.norm```
+3. [x] ```llama.Llama.forward```
+4. [x] ```llama.Llama.generate```
+5. [x] ```rope.apply_rotary_emb``` (this one may be tricky! you can use `rope_test.py` to test your implementation)
+6. [x] ```optimizer.AdamW.step```
+7. [x] ```classifier.LlamaEmbeddingClassifier.forward```
 
 *ATTENTION:* you are free to re-organize the functions inside each class, but please don't change the variable names that correspond to Llama2 parameters. The change to these variable names will fail to load the pre-trained weights.
 
