@@ -331,6 +331,8 @@ if __name__ == "__main__":
 	args.filepath = f'{args.option}-{args.epochs}-{args.lr}.pt' # save path
 	seed_everything(args.seed)  # fix the seed for reproducibility
 
+	torch.autograd.set_detect_anomaly(True)
+
 	if args.option == "generate":
 		# Step 1
 		# Complete this sentence to test your implementation!
